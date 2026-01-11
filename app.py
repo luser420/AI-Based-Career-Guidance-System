@@ -39,7 +39,7 @@ for key in [
 # =========================================================
 # AGENT 1 — LINKEDIN-STYLE PROFILE FORM
 # =========================================================
-st.header("👤 Candidate Profile")
+st.header("Candidate Profile")
 
 with st.form("candidate_profile_form"):
     col1, col2 = st.columns(2)
@@ -69,7 +69,7 @@ with st.form("candidate_profile_form"):
     )
 
     achievements = st.text_area(
-        "Achievements / Certifications",
+        "Achievements / Certifications / Extra-Curricular Activities ",
         placeholder="Certifications, awards, hackathons, etc."
     )
 
@@ -114,7 +114,7 @@ if st.session_state.structured_profile:
 # =========================================================
 if st.session_state.structured_profile:
     st.divider()
-    st.header("🎯 Job Role Recommendations")
+    st.header("Job Role Recommendations")
 
     if st.button("Recommend Job Roles"):
         with st.spinner("Identifying best-fit roles..."):
@@ -136,7 +136,7 @@ if st.session_state.structured_profile:
 # =========================================================
 if st.session_state.job_recommendations:
     st.divider()
-    st.header("📈 Skill Gap Analysis")
+    st.header("Skill Gap Analysis")
 
     if st.button("Analyze Skill Gaps"):
         with st.spinner("Evaluating industry readiness..."):
@@ -159,7 +159,7 @@ if st.session_state.job_recommendations:
 # =========================================================
 if st.session_state.skill_gap_analysis:
     st.divider()
-    st.header("📄 ATS-Friendly Resume")
+    st.header("ATS-Friendly Resume")
 
     if st.button("Generate Resume"):
         with st.spinner("Generating professional resume..."):
