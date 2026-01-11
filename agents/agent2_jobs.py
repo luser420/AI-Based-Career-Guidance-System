@@ -1,8 +1,7 @@
 from groq import Groq
 
-
 def job_recommendation_agent(
-    candidate_profile_summary: str,
+    structured_profile: str,  # Changed from candidate_profile_summary
     groq_client: Groq
 ) -> str:
     """
