@@ -83,46 +83,30 @@ if submitted:
     else:
         with st.spinner("Analyzing profile like a career consultant..."):
             try:
-                structured_input = f"""
-Name: {name}
-
-Education:
-- Degree: {degree}
-- Specialization: {specialization}
-- Institution: {institution}
-
-Technical Skills:
-{technical_skills}
-
-Non-Technical Skills:
-{soft_skills}
-
-Projects / Experience:
-{projects}
-
-Achievements:
-{achievements}
-"""
-
+                # This is the call to your agent function
                 st.session_state.structured_profile = candidate_understanding_agent(
-    candidate_profile={
-        "name": name,
-        "education": {
-            "degree": degree,
-            "specialization": specialization,
-            "institution": institution
-        },
-        "technical_skills": [s.strip() for s in technical_skills.split(",") if s.strip()],
-        "soft_skills": [s.strip() for s in soft_skills.split(",") if s.strip()],
-        "projects": projects,
-        "achievements": achievements
-    },
-    groq_client=groq_client
-)
+                    candidate_profile={
+                        "name": name,
+                        "education": {
+                            "degree": degree,
+                            "specialization": specialization,
+                            "institution": institution
+                        },
+                        "technical_skills": [s.strip() for s in technical_skills.split(",") if s.strip()],
+                        "soft_skills": [s.strip() for s in soft_skills.split(",") if s.strip()],
+                        "projects": projects,
+                        "achievements": achievements
+                    },
+                    groq_client=groq_client
+                )
+                st.success("Profile analyzed!")
+            except Exception as e:
+                st.error(f"Agent 1 failed: {e}")
 
+# This part is now outside the try/except block
 if st.session_state.structured_profile:
     st.subheader("📌 Structured Candidate Profile")
-    st.text(st.session_state.structured_profile)
+    st.markdown(st.session_state.structured_profile)
 
 
 # =========================================================
