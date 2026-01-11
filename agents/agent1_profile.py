@@ -17,16 +17,38 @@ def validate_candidate_profile(profile: dict) -> dict:
     return profile
 
 
-def candidate_understanding_agent(
-    candidate_profile: dict,
-    groq_client: Groq
-) -> str:
+def candidate_understanding_agent(candidate_profile: dict, groq_client: Groq) -> str:
     """
-    Transforms structured candidate data into a professional,
-    LinkedIn-style profile understanding.
+    candidate_profile: dict with keys
+        - name
+        - education {degree, specialization, institution}
+        - technical_skills (list)
+        - soft_skills (list)
+        - projects (str)
+        - achievements (str)
+    groq_client: Groq API client
     """
+    # Build prompt from dictionary
+    profile_text = f"""
+Name: {candidate_profile['name']}
 
-    candidate_profile = validate_candidate_profile(candidate_profile)
+Education:
+- Degree: {candidate_profile['education']['degree']}
+- Specialization: {candidate_profile['education']['specialization']}
+- Institution: {candidate_profile['education']['institution']}
+
+Technical Skills:
+{', '.join(candidate_profile['technical_skills'])}
+
+Non-Technical Skills:
+{', '.join(candidate_profile['soft_skills'])}
+
+Projects / Experience:
+{candidate_profile['projects']}
+
+Achievements:
+{candidate_profile['achievements']}
+"""
 
     prompt = f"""
 You are a Senior Career Consultant with extensive experience in early-career

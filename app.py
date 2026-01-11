@@ -105,16 +105,20 @@ Achievements:
 """
 
                 st.session_state.structured_profile = candidate_understanding_agent(
-                    profile_text=structured_input,
-                    source="form",
-                    groq_client=groq_client
-                )
-
-                st.success("Profile analyzed successfully.")
-
-            except Exception as e:
-                st.error(f"Agent 1 failed: {e}")
-
+    candidate_profile={
+        "name": name,
+        "education": {
+            "degree": degree,
+            "specialization": specialization,
+            "institution": institution
+        },
+        "technical_skills": [s.strip() for s in technical_skills.split(",") if s.strip()],
+        "soft_skills": [s.strip() for s in soft_skills.split(",") if s.strip()],
+        "projects": projects,
+        "achievements": achievements
+    },
+    groq_client=groq_client
+)
 
 if st.session_state.structured_profile:
     st.subheader("📌 Structured Candidate Profile")
