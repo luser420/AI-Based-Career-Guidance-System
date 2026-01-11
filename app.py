@@ -1,28 +1,23 @@
 import streamlit as st
-import tempfile
 from groq import Groq
 
-from agents.agent1_profile import (
-    extract_text_from_pdf,
-    extract_text_from_docx,
-    clean_text,
-    candidate_understanding_agent
-)
-
+from agents.agent1_profile import candidate_understanding_agent
 from agents.agent2_jobs import job_recommendation_agent
 from agents.agent3_skill_gap import skill_gap_analysis_agent
 from agents.agent4_resume_builder import resume_generation_agent
 
 
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
     page_title="AI-Based Career Guidance System",
     layout="wide"
 )
 
 st.title("AI-Based Career Guidance System")
-st.caption("Multi-Agent Career Evaluation • Professional & Explainable")
+st.caption("Multi-Agent Career Evaluation • LinkedIn-Style • Professional & Explainable")
 
-# -------- API KEY SETUP (STREAMLIT SECRETS) --------
+
+# ---------------- API KEY ----------------
 try:
     groq_client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 except KeyError:
@@ -30,8 +25,8 @@ except KeyError:
     st.stop()
 
 
+# ---------------- SESSION STATE ----------------
 for key in [
-    "profile_text",
     "structured_profile",
     "job_recommendations",
     "skill_gap_analysis",
@@ -41,122 +36,145 @@ for key in [
         st.session_state[key] = None
 
 
-st.header("Agent 1: Resume Understanding & Profile Analysis")
+# =========================================================
+# AGENT 1 — LINKEDIN-STYLE PROFILE FORM
+# =========================================================
+st.header("👤 Candidate Profile")
 
-input_mode = st.radio(
-    "How would you like to provide your profile?",
-    ["Upload Resume (PDF / DOCX)", "Paste Profile Text"]
-)
+with st.form("candidate_profile_form"):
+    col1, col2 = st.columns(2)
 
-profile_text = ""
-source_type = ""
+    with col1:
+        name = st.text_input("Full Name")
+        degree = st.selectbox(
+            "Highest Degree",
+            ["B.Tech", "B.Sc", "B.Com", "BA", "M.Tech", "M.Sc", "MBA", "Other"]
+        )
+        specialization = st.text_input("Specialization")
+        institution = st.text_input("Institution / University")
 
-if input_mode == "Upload Resume (PDF / DOCX)":
-    uploaded_file = st.file_uploader(
-        "Upload your resume",
-        type=["pdf", "docx"]
+    with col2:
+        technical_skills = st.text_area(
+            "Technical Skills (comma-separated)",
+            placeholder="Python, SQL, Machine Learning, Power BI"
+        )
+        soft_skills = st.text_area(
+            "Non-Technical Skills",
+            placeholder="Communication, Leadership, Problem Solving"
+        )
+
+    projects = st.text_area(
+        "Projects / Internships",
+        placeholder="Describe projects, tools used, and outcomes"
     )
 
-    if uploaded_file:
-        with tempfile.NamedTemporaryFile(delete=False) as tmp:
-            tmp.write(uploaded_file.read())
-            file_path = tmp.name
-
-        try:
-            if uploaded_file.name.endswith(".pdf"):
-                profile_text = extract_text_from_pdf(file_path)
-            else:
-                profile_text = extract_text_from_docx(file_path)
-
-            profile_text = clean_text(profile_text)
-            source_type = "resume"
-
-            st.success("Resume uploaded and processed successfully.")
-
-        except Exception as e:
-            st.error(f"Resume processing failed: {e}")
-
-else:
-    profile_text = st.text_area(
-        "Paste your resume or profile text here:",
-        height=300
+    achievements = st.text_area(
+        "Achievements / Certifications",
+        placeholder="Certifications, awards, hackathons, etc."
     )
-    source_type = "manual"
+
+    submitted = st.form_submit_button("Analyze My Profile")
 
 
-if st.button("Run Agent 1: Analyze Profile"):
-    if not profile_text or len(profile_text) < 100:
-        st.warning("Please provide sufficient profile information.")
+# ---------------- RUN AGENT 1 ----------------
+if submitted:
+    if not name or not degree or not technical_skills:
+        st.warning("Please fill in at least Name, Degree, and Technical Skills.")
     else:
-        with st.spinner("Agent 1 is analyzing the profile..."):
+        with st.spinner("Analyzing profile like a career consultant..."):
             try:
+                structured_input = f"""
+Name: {name}
+
+Education:
+- Degree: {degree}
+- Specialization: {specialization}
+- Institution: {institution}
+
+Technical Skills:
+{technical_skills}
+
+Non-Technical Skills:
+{soft_skills}
+
+Projects / Experience:
+{projects}
+
+Achievements:
+{achievements}
+"""
+
                 st.session_state.structured_profile = candidate_understanding_agent(
-                    profile_text=profile_text,
-                    source=source_type,
+                    profile_text=structured_input,
+                    source="form",
                     groq_client=groq_client
                 )
 
-                st.success("Agent 1 analysis completed.")
+                st.success("Profile analyzed successfully.")
 
             except Exception as e:
                 st.error(f"Agent 1 failed: {e}")
 
 
 if st.session_state.structured_profile:
-    st.subheader("Structured Candidate Profile")
+    st.subheader("📌 Structured Candidate Profile")
     st.text(st.session_state.structured_profile)
 
+
+# =========================================================
+# AGENT 2 — JOB RECOMMENDATIONS
+# =========================================================
 if st.session_state.structured_profile:
     st.divider()
-    st.header("Agent 2: Job Role Recommendations")
+    st.header("🎯 Job Role Recommendations")
 
-    if st.button("Run Agent 2: Recommend Job Roles"):
-        with st.spinner("Agent 2 is evaluating suitable job roles..."):
+    if st.button("Recommend Job Roles"):
+        with st.spinner("Identifying best-fit roles..."):
             try:
                 st.session_state.job_recommendations = job_recommendation_agent(
                     structured_profile=st.session_state.structured_profile,
                     groq_client=groq_client
                 )
-
                 st.success("Job recommendations generated.")
-
             except Exception as e:
                 st.error(f"Agent 2 failed: {e}")
 
     if st.session_state.job_recommendations:
-        st.subheader("Recommended Job Roles")
         st.text(st.session_state.job_recommendations)
 
 
+# =========================================================
+# AGENT 3 — SKILL GAP ANALYSIS
+# =========================================================
 if st.session_state.job_recommendations:
     st.divider()
-    st.header("Agent 3: Skill Gap Analysis")
+    st.header("📈 Skill Gap Analysis")
 
-    if st.button("Run Agent 3: Analyze Skill Gaps"):
-        with st.spinner("Agent 3 is analyzing skill gaps..."):
+    if st.button("Analyze Skill Gaps"):
+        with st.spinner("Evaluating industry readiness..."):
             try:
                 st.session_state.skill_gap_analysis = skill_gap_analysis_agent(
                     structured_profile=st.session_state.structured_profile,
                     job_recommendations=st.session_state.job_recommendations,
                     groq_client=groq_client
                 )
-
                 st.success("Skill gap analysis completed.")
-
             except Exception as e:
                 st.error(f"Agent 3 failed: {e}")
 
     if st.session_state.skill_gap_analysis:
-        st.subheader("Skill Gap & Upskilling Insights")
         st.text(st.session_state.skill_gap_analysis)
 
 
+# =========================================================
+# AGENT 4 — RESUME GENERATION
+# =========================================================
 if st.session_state.skill_gap_analysis:
     st.divider()
-    st.header("Agent 4: Resume Generation")
+    st.header("📄 ATS-Friendly Resume")
 
-    if st.button("Run Agent 4: Generate Resume"):
-        with st.spinner("Agent 4 is generating a professional resume..."):
+    if st.button("Generate Resume"):
+        with st.spinner("Generating professional resume..."):
             try:
                 st.session_state.generated_resume = resume_generation_agent(
                     structured_profile=st.session_state.structured_profile,
@@ -164,12 +182,9 @@ if st.session_state.skill_gap_analysis:
                     skill_gap_analysis=st.session_state.skill_gap_analysis,
                     groq_client=groq_client
                 )
-
                 st.success("Resume generated successfully.")
-
             except Exception as e:
                 st.error(f"Agent 4 failed: {e}")
 
     if st.session_state.generated_resume:
-        st.subheader("Generated ATS-Friendly Resume")
         st.text(st.session_state.generated_resume)
