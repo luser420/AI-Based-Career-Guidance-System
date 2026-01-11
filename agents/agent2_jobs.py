@@ -1,7 +1,8 @@
 from groq import Groq
 
+
 def job_recommendation_agent(
-    structured_profile: str,  # Changed from candidate_profile_summary
+    structured_profile: str,
     groq_client: Groq
 ) -> str:
     """
@@ -26,7 +27,7 @@ Guidelines:
 - Do NOT ask questions
 
 CANDIDATE PROFILE SUMMARY:
-{candidate_profile_summary}
+{structured_profile}
 
 OUTPUT FORMAT (STRICT):
 

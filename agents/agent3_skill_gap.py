@@ -2,7 +2,7 @@ from groq import Groq
 
 
 def skill_gap_analysis_agent(
-    candidate_profile_summary: str,
+    structured_profile: str,
     job_recommendations: str,
     groq_client: Groq
 ) -> str:
@@ -23,11 +23,11 @@ Guidelines:
 - Do NOT invent gaps if the candidate already meets expectations
 - Clearly distinguish between strengths and gaps
 - Keep the tone supportive, practical, and realistic
-- Avoid generic advice (e.g., “improve communication” unless justified)
+- Avoid generic advice
 - Do NOT ask questions
 
 CANDIDATE PROFILE SUMMARY:
-{candidate_profile_summary}
+{structured_profile}
 
 RECOMMENDED JOB ROLES:
 {job_recommendations}
@@ -53,8 +53,7 @@ Targeted Upskilling Plan:
 
 Career Readiness Assessment:
 - Overall Readiness Level (Low / Moderate / Strong):
-- 2–3 lines explaining how close the candidate is to being job-ready
-- Mention whether the gaps are short-term or long-term to close
+- 2–3 lines explaining job-readiness distance
 """
 
     response = groq_client.chat.completions.create(

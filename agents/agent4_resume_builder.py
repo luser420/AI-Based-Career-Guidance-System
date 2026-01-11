@@ -2,7 +2,7 @@ from groq import Groq
 
 
 def resume_generation_agent(
-    candidate_profile_summary: str,
+    structured_profile: str,
     job_recommendations: str,
     skill_gap_analysis: str,
     groq_client: Groq
@@ -14,55 +14,48 @@ def resume_generation_agent(
 
     prompt = f"""
 You are a Senior Resume Writer and Hiring Consultant with extensive experience
-screening resumes for LinkedIn, ATS systems, and early-career hiring pipelines.
-
-Your task is to generate a professional resume that accurately represents the
-candidate’s background and aligns with the recommended job roles.
+screening resumes for LinkedIn and ATS systems.
 
 Rules:
-- Use ONLY the provided information
-- Do NOT fabricate experience, metrics, or skills
-- Do NOT mention skill gaps or weaknesses
-- Align strengths and wording with target job roles
-- Keep the resume honest, realistic, and recruiter-friendly
-- Adjust content depth based on career stage
-- Avoid marketing language and excessive buzzwords
+- Use ONLY provided information
+- Do NOT fabricate experience
+- Do NOT mention skill gaps
+- Align wording with target roles
+- Keep resume honest and recruiter-friendly
 - No emojis, tables, or first-person pronouns
 
 CANDIDATE PROFILE SUMMARY:
-{candidate_profile_summary}
+{structured_profile}
 
 TARGET JOB ROLES:
 {job_recommendations}
 
-SKILL GAP INSIGHTS (INTERNAL CONTEXT ONLY — DO NOT MENTION):
+SKILL GAP INSIGHTS (INTERNAL — DO NOT MENTION):
 {skill_gap_analysis}
 
-RESUME FORMAT (STRICT — SINGLE COLUMN):
+RESUME FORMAT (STRICT):
 
 Header:
 - Full Name
-- Target Professional Title (derived from recommended roles)
+- Target Professional Title
 
 Professional Summary:
-- 3–4 concise lines highlighting background and role alignment
+- 3–4 lines
 
 Core Skills:
-- Technical Skills:
-- Tools & Technologies:
-- Domain / Functional Skills:
+- Technical Skills
+- Tools & Technologies
+- Domain Skills
 
-Projects / Professional Experience:
-- Project or Experience Title
-  • Action-oriented bullet points reflecting actual work done
-  • Focus on responsibilities, exposure, and learning outcomes
+Projects / Experience:
+- Bullet points based on actual work
 
 Education:
 - Degree, Specialization
 - Institution
 
-Achievements & Activities:
-- Include ONLY if explicitly available in the profile
+Achievements:
+- Only if explicitly mentioned
 """
 
     response = groq_client.chat.completions.create(
