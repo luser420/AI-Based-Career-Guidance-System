@@ -2,72 +2,73 @@ from groq import Groq
 
 
 def resume_generation_agent(
-    structured_profile: str,
+    candidate_profile_summary: str,
     job_recommendations: str,
     skill_gap_analysis: str,
     groq_client: Groq
 ) -> str:
     """
-    Generates a professional, ATS-friendly resume aligned with the
-    candidate's profile and target job roles.
+    Generates a clean, professional, ATS-friendly resume aligned with
+    the candidate’s profile and recommended job roles.
     """
 
     prompt = f"""
-You are a Senior Resume Writer and Hiring Consultant.
+You are a Senior Resume Writer and Hiring Consultant with extensive experience
+screening resumes for LinkedIn, ATS systems, and early-career hiring pipelines.
 
-Your task is to generate a **professional, ATS-friendly resume** based on the
-candidate profile and target job roles.
+Your task is to generate a professional resume that accurately represents the
+candidate’s background and aligns with the recommended job roles.
 
 Rules:
-- Do NOT mention skill gaps
-- Do NOT fabricate experience
-- Keep resume realistic and honest
-- Align strengths with recommended roles
-- Adjust depth based on experience level
-- Use clean, simple formatting
-- Avoid excessive buzzwords
+- Use ONLY the provided information
+- Do NOT fabricate experience, metrics, or skills
+- Do NOT mention skill gaps or weaknesses
+- Align strengths and wording with target job roles
+- Keep the resume honest, realistic, and recruiter-friendly
+- Adjust content depth based on career stage
+- Avoid marketing language and excessive buzzwords
+- No emojis, tables, or first-person pronouns
 
-CANDIDATE PROFILE:
-{structured_profile}
+CANDIDATE PROFILE SUMMARY:
+{candidate_profile_summary}
 
 TARGET JOB ROLES:
 {job_recommendations}
 
-SKILL GAP INSIGHTS (INTERNAL CONTEXT ONLY):
+SKILL GAP INSIGHTS (INTERNAL CONTEXT ONLY — DO NOT MENTION):
 {skill_gap_analysis}
 
-RESUME STRUCTURE (STRICT):
+RESUME FORMAT (STRICT — SINGLE COLUMN):
 
 Header:
-- Name
-- Professional Title
+- Full Name
+- Target Professional Title (derived from recommended roles)
 
 Professional Summary:
-- 3–4 lines
+- 3–4 concise lines highlighting background and role alignment
 
-Key Skills:
-- Grouped logically (Technical / Tools / Domain)
+Core Skills:
+- Technical Skills:
+- Tools & Technologies:
+- Domain / Functional Skills:
 
-Projects / Experience:
-- Based on available data
-- Use bullet points
+Projects / Professional Experience:
+- Project or Experience Title
+  • Action-oriented bullet points reflecting actual work done
+  • Focus on responsibilities, exposure, and learning outcomes
 
 Education:
-- Degree, institution, specialization
+- Degree, Specialization
+- Institution
 
-Achievements:
-- Only if available
-
-Formatting Rules:
-- No tables
-- No emojis
-- No first-person pronouns
+Achievements & Activities:
+- Include ONLY if explicitly available in the profile
 """
 
     response = groq_client.chat.completions.create(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.25
+        temperature=0.2
     )
 
     return response.choices[0].message.content.strip()

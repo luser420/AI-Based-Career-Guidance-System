@@ -2,51 +2,65 @@ from groq import Groq
 
 
 def skill_gap_analysis_agent(
-    structured_profile: str,
+    candidate_profile_summary: str,
     job_recommendations: str,
     groq_client: Groq
 ) -> str:
     """
-    Performs a personalized skill gap analysis based on the candidate profile
-    and recommended job roles.
+    Evaluates the candidate’s readiness for the recommended roles by identifying
+    genuine skill gaps and suggesting targeted upskilling actions.
     """
 
     prompt = f"""
-You are a Senior Career Development & Workforce Readiness Expert.
+You are a Senior Career Development Consultant specializing in workforce
+readiness and early-career skill alignment.
 
-Your task is to identify **relevant skill gaps** between the candidate's
-current profile and the recommended job roles.
+Your task is to analyze the candidate’s profile against the recommended job
+roles and identify ONLY meaningful skill gaps that could impact employability.
 
 Guidelines:
-- Analyze ONLY skills relevant to the suggested roles
-- Do NOT force a fixed number of skills
-- Mention gaps only if they genuinely exist
-- Keep tone supportive and constructive
-- Suggest upskilling only where necessary
-- Avoid generic or obvious advice
+- Focus strictly on skills relevant to the recommended roles
+- Do NOT invent gaps if the candidate already meets expectations
+- Clearly distinguish between strengths and gaps
+- Keep the tone supportive, practical, and realistic
+- Avoid generic advice (e.g., “improve communication” unless justified)
+- Do NOT ask questions
 
-CANDIDATE PROFILE:
-{structured_profile}
+CANDIDATE PROFILE SUMMARY:
+{candidate_profile_summary}
 
 RECOMMENDED JOB ROLES:
 {job_recommendations}
 
 OUTPUT FORMAT (STRICT):
 
-Skill Gaps:
-- (List only missing or underdeveloped skills, if any)
+Role-Wise Skill Readiness:
 
-Upskilling Recommendations:
-- (Practical learning actions, tools, or focus areas — only if required)
+1. Role Title:
+   - Skills Already Aligned:
+   - Skills Requiring Improvement:
+   - Critical Missing Skills (if any):
 
-Career Readiness Insight:
-(2–3 lines on overall readiness for the suggested roles)
+2. Role Title (if applicable):
+   - Skills Already Aligned:
+   - Skills Requiring Improvement:
+   - Critical Missing Skills (if any):
+
+Targeted Upskilling Plan:
+- Skill / Area:
+  Recommended Action:
+  Suggested Tools / Platforms:
+
+Career Readiness Assessment:
+- Overall Readiness Level (Low / Moderate / Strong):
+- 2–3 lines explaining how close the candidate is to being job-ready
+- Mention whether the gaps are short-term or long-term to close
 """
 
     response = groq_client.chat.completions.create(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
+        temperature=0.25
     )
 
     return response.choices[0].message.content.strip()
