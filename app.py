@@ -69,7 +69,7 @@ with st.form("candidate_profile_form"):
     )
 
     achievements = st.text_area(
-        "Achievements / Certifications / Extra-Curricular Activities ",
+        "Achievements / Certifications / Extra-Curricular Activities",
         placeholder="Certifications, awards, hackathons, etc."
     )
 
@@ -83,7 +83,6 @@ if submitted:
     else:
         with st.spinner("Analyzing profile like a career consultant..."):
             try:
-                # This is the call to your agent function
                 st.session_state.structured_profile = candidate_understanding_agent(
                     candidate_profile={
                         "name": name,
@@ -103,9 +102,10 @@ if submitted:
             except Exception as e:
                 st.error(f"Agent 1 failed: {e}")
 
-# This part is now outside the try/except block
+
+# ---------------- AGENT 1 OUTPUT ----------------
 if st.session_state.structured_profile:
-    st.subheader("📌 Structured Candidate Profile")
+    st.subheader("Structured Candidate Profile")
     st.markdown(st.session_state.structured_profile)
 
 
@@ -128,7 +128,7 @@ if st.session_state.structured_profile:
                 st.error(f"Agent 2 failed: {e}")
 
     if st.session_state.job_recommendations:
-        st.text(st.session_state.job_recommendations)
+        st.markdown(st.session_state.job_recommendations)
 
 
 # =========================================================
@@ -151,7 +151,7 @@ if st.session_state.job_recommendations:
                 st.error(f"Agent 3 failed: {e}")
 
     if st.session_state.skill_gap_analysis:
-        st.text(st.session_state.skill_gap_analysis)
+        st.markdown(st.session_state.skill_gap_analysis)
 
 
 # =========================================================
@@ -175,4 +175,4 @@ if st.session_state.skill_gap_analysis:
                 st.error(f"Agent 4 failed: {e}")
 
     if st.session_state.generated_resume:
-        st.text(st.session_state.generated_resume)
+        st.markdown(st.session_state.generated_resume)
