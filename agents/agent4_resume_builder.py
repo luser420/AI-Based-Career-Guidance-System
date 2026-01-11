@@ -8,54 +8,74 @@ def resume_generation_agent(
     groq_client: Groq
 ) -> str:
     """
-    Generates a clean, professional, ATS-friendly resume aligned with
-    the candidate’s profile and recommended job roles.
+    Generates a clean, ATS-friendly resume with proper markdown formatting.
     """
 
     prompt = f"""
-You are a Senior Resume Writer and Hiring Consultant with extensive experience
-screening resumes for LinkedIn and ATS systems.
+You are a Senior Resume Writer and Hiring Consultant.
 
-Rules:
-- Use ONLY provided information
-- Do NOT fabricate experience
+Generate a **professional, ATS-friendly resume** using the information below.
+
+STRICT RULES:
+- Use Markdown headings
+- Clean spacing
+- Bullet points only
+- No emojis
+- No tables
+- No first-person language
 - Do NOT mention skill gaps
-- Align wording with target roles
-- Keep resume honest and recruiter-friendly
-- No emojis, tables, or first-person pronouns
 
-CANDIDATE PROFILE SUMMARY:
+---
+
+## Candidate Profile
 {structured_profile}
 
-TARGET JOB ROLES:
+---
+
+## Target Job Roles
 {job_recommendations}
 
-SKILL GAP INSIGHTS (INTERNAL — DO NOT MENTION):
-{skill_gap_analysis}
+---
 
-RESUME FORMAT (STRICT):
+## Resume Output (STRICT FORMAT)
 
-Header:
-- Full Name
-- Target Professional Title
+# Full Name
+**Target Professional Title**
 
-Professional Summary:
-- 3–4 lines
+---
 
-Core Skills:
-- Technical Skills
-- Tools & Technologies
-- Domain Skills
+## Professional Summary
+- 3–4 concise bullet points aligned to target roles
 
-Projects / Experience:
-- Bullet points based on actual work
+---
 
-Education:
-- Degree, Specialization
+## Core Skills
+**Technical Skills**
+- ...
+
+**Tools & Technologies**
+- ...
+
+**Domain Skills**
+- ...
+
+---
+
+## Projects / Experience
+**Project / Role Title**
+- Action-oriented bullet points
+- Focus on responsibilities and learning outcomes
+
+---
+
+## Education
+- Degree, Specialization  
 - Institution
 
-Achievements:
-- Only if explicitly mentioned
+---
+
+## Achievements
+- Include ONLY if explicitly present
 """
 
     response = groq_client.chat.completions.create(
